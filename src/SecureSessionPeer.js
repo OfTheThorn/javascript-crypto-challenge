@@ -7,7 +7,7 @@ let tempObj = async(peer = null) =>
     await _nacl.ready;
     let nacl = _nacl;
 
-    let nonce, sessionKeys, msg_friend, secureSessionPeer = {}, thisObj = {}, encryptor, decryptor;
+    let sessionKeys, msg_friend, secureSessionPeer = {}, thisObj = {}, encryptor, decryptor;
     const {publicKey, privateKey} = nacl.crypto_kx_keypair();
 
     if (peer) {
@@ -25,19 +25,11 @@ let tempObj = async(peer = null) =>
         secureSessionPeer = sess;
     }
     thisObj.setMsg = function (msg) {
-        thisObj.msg_friend = msg;
-    }
-    thisObj.getNonce = function () {
-        return nonce;
-    }
-    thisObj.setMsg = function (msg) {
         msg_friend = msg;
     }
 
     thisObj.encrypt = function (msg) {
-        const nonce = nacl.randombytes_buf(nacl.crypto_secretbox_NONCEBYTES);
-        const ciphertext = encryptor.encrypt(msg, nonce);
-        return {ciphertext, nonce}
+        return encryptor.encrypt(msg);
     }
     thisObj.decrypt = function (ciphertext, nonce) {
         return decryptor.decrypt(ciphertext, nonce);
